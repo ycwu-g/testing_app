@@ -58,8 +58,11 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: stable
-      - run: flutter build ios
-      # - run: ./tool/ios_ci_script.sh
+          
+      - run: flutter pub get
+
+      - run: flutter build ios --release --no-codesign
+      
       - uses: actions/upload-artifact@v1
         with:
           name: release-ipa
