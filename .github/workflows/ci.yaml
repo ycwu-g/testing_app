@@ -1,7 +1,7 @@
 name: Loki
 
 env:
-  timeout: 10
+  TIME_OUT: 10
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
   android-build:
     name: Android Build
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ env.timeout }}
+    timeout-minutes: ${{ TIME_OUT }}
     steps:
       - name: Dumping Repo Info
         env: 
