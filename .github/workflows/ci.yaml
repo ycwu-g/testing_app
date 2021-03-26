@@ -9,18 +9,16 @@ on:
     branches:
     - master
 
-env:
-  TIMEOUT: ${{ 10 }}
+env: 
+  GITHUB_CONTEXT: ${{ toJSON(github) }}
 
 jobs:
   android-build:
     name: Android Build
     runs-on: ubuntu-latest
-    timeout-minutes: $TIMEOUT
+    timeout-minutes: 10
     steps:
       - name: Dumping Repo Info
-        env: 
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
       
       - name: Check out
