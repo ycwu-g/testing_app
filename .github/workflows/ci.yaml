@@ -12,6 +12,10 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
+      os:
+        description: 'Target os, ios/android/both'
+        required: false
+        default: 'both'
       group:
         description: 'Group to be distributed to'
         required: true
@@ -21,16 +25,26 @@ env:
   GITHUB_CONTEXT: ${{ toJSON(github) }}
 
 jobs:
-  android-build:
-    name: Android Build
+  # Common flutter pub setup
+  flutter-config:
+    name: Flutter Config
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Dumping Repo Info
         run: echo "$GITHUB_CONTEXT"
-      
+
+  # Build Job for Android
+  android-build:
+    name: Android Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+
       - name: Check out
         uses: actions/checkout@v2
+        with:
+          submodules: true
       
       - name: Setup Java
         uses: actions/setup-java@v1
@@ -41,9 +55,8 @@ jobs:
       - name: Calling subosito/flutter action
         uses: subosito/flutter-action@v1
         with:
-          channel: 'stable' # 'dev', 'alpha', default to: 'stable'
-          # flutter-version: '1.12.x' # you can also specify exact version of flutter
-      
+          channel: 'stable' 
+
       # Get flutter dependencies and build apk
       - name: Pub get and build apk
         run: |
@@ -65,3 +78,41 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
           file: build/app/outputs/apk/release/app-release.apk
+  
+  # Build Job for iOS
+  ios-build:
+    # if: ${{ env.os == 'iOS' || env.os == 'both' }}
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - name: Dumping Repo Info
+        run: echo "$GITHUB_CONTEXT"
+      
+      - name: Check out
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      
+      # Setup the flutter environment.
+      - name: Calling subosito/flutter action
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+
+      # Get flutter dependencies and build ipa
+      - name: Pub get and build ipa
+        run: |
+          flutter clean
+          flutter pub get
+          flutter build ios --release --no-codesign          
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-build
+          path: build/ios/iphoneos
+          retention-days: 14
