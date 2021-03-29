@@ -36,7 +36,7 @@ jobs:
 
   # Build Job for Android
   android-build:
-    if: ${{ env.os == 'android' || env.os == 'both' }}
+    if: ${{ github.event.inputs.os == 'android' || github.event.inputs.os == 'both' }}
     name: Android Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -82,7 +82,7 @@ jobs:
   
   # Build Job for iOS
   ios-build:
-    if: ${{ env.os == 'iOS' || env.os == 'both' }}
+    if: ${{ github.event.inputs.os == 'iOS' || github.event.inputs.os == 'both' }}
     runs-on: macos-latest
     timeout-minutes: 10
     steps:
